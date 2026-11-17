@@ -47,11 +47,14 @@ jobs:
 
       - name: Save images
         run: |
-          docker images --format '{{.Repository}}:{{.Tag}}' | grep '^docker.io/percona/proxysql_exporter:' | tee images.txt
-          docker save -o proxysql_exporter-images.tar $(cat images.txt)
+          mkdir -p ctx/linux/amd64
+          cp build/proxysql_exporter_linux_amd64_v1/proxysql_exporter ctx/linux/amd64/
+          docker buildx build --load --platform linux/amd64 -f .scripts/Dockerfile -t proxysql_exporter:test ctx
+          docker run --rm proxysql_exporter:test --version
+          docker save -o proxysql_exporter-image-amd64.tar proxysql_exporter:test
 
       - name: Upload images
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: images
-          path: proxysql_exporter-images.tar
+          path: proxysql_exporter-image-amd64.tar
