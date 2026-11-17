@@ -5,7 +5,7 @@ name: Package check
 on:
   push:
     branches:
-      - main
+      - ci/package-test
   workflow_dispatch:
 
 permissions:
